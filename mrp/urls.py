@@ -8,7 +8,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('timepiece.urls')),
     path('', RedirectView.as_view(url='/time/')),
-    path('', include('inventory.urls')),
     path('mrp/', include('mrp_system.urls')),
 
 
