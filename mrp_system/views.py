@@ -35,6 +35,8 @@ def PartCreate(request, type_id):
             part_formset.instance = self_object
            # part_formset = ManufacturerFromSet(request.POST, instance = self_object)
             part_formset.save()
+            url = reverse('list_parts', args=[partType.pk])
+            return HttpResponseRedirect(url)
     else:
         #self.object = None
         form = PartForm(type_id=type_id)
