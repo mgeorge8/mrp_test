@@ -56,13 +56,18 @@ class TypeForm(ModelForm):
     class Meta:
         model = Type
         exclude = ()
-        
+        labels = {
+            "name": "Type Name"
+        }
 
 class FieldForm(ModelForm):
     class Meta:
         model = Field
         exclude = ()
-   #     fields = ('fields',)
+        labels = {
+            "name": "Field Name",
+            "fields": "Field Type"
+        }
 
 FieldFormSet = inlineformset_factory(Type, Field, form=FieldForm, extra=4)
 

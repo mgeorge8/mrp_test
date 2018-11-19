@@ -10,7 +10,10 @@
 {% csrf_token %}
 {{ form.as_p }}
 {% csrf_token %}
-{{ field_formset }}<br>
+{{ field_formset.management_form }}
+{% for form in field_formset %}
+{{ form }} <br>
+{% endfor %}
 <input type="submit" value="Save"/>
 </form>
 
