@@ -1,0 +1,24 @@
+{% extends "base2.html" %}
+
+
+{% block title %}Parts{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+<h3> Create New {{ partType }}</h3>
+<a href="{% url 'create_manufacturer' %}">New Manufacturer</a> &nbsp;&nbsp;
+<a href="{% url 'create_location' %}">New Location</a>
+<br><br>
+<div class="form-horizontal">
+<form action="" method="post">
+{% csrf_token %}
+{{ form.as_p }}
+{% csrf_token %}
+{{ part_formset }}
+<input type="submit" value="Save"/>
+</form>
+
+</div>
+<hr/>
+        </div>
+{% endblock content %}

@@ -1,0 +1,50 @@
+{% extends "base2.html" %}
+{% load mrp_tags %}
+
+{% block title %}Parts{% endblock title %}
+
+{% block content %}
+
+<div class="container-fluid">
+<h2>{{ type }} Parts</h2>
+<a href="{% url 'create_part' type.id %}">Create new {{ type }}</a>
+<br><br>
+<div class="form-horizontal">
+<form action="" method="post">
+{% csrf_token %}
+{{ form }}
+</form>
+</div>
+<hr/>
+            
+            <table class='table table-bordered table-striped table-condensed'>
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th>Description</th>
+                        <th>Location</th>
+			<th>Manufacturer</th>
+			 <th>Part Number</th>
+			{% for field in fields %}
+			<th>{{ field.name }}</th>
+			{% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for part in parts %}
+                        <tr>
+                            <td>{{ part.partNumber }}</td>
+                            <td>{{ part.description }}</td>
+                            <td>{{ part.get_location }}</td>
+			     <td>{{ part.get_manufacturers }}</td>
+			     <td>{{ part.get_related }} </td>
+			{% for field in fields %}
+			<td>{{ part|get_obj_attr:field.fields }}</td>
+			{% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+     
+    </div>
+{% endblock content %}

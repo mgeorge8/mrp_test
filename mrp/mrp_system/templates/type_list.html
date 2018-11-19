@@ -1,0 +1,19 @@
+{% extends "base2.html" %}
+
+
+{% block title %}Parts{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+<h2> Part Types </h2>
+<a href="{% url 'create_type' %}"> Create New Type</a>
+<hr>           
+<br> 
+                                {% for type in object_list %}
+                        <a href="{% url 'list_parts' type.id %}">{{ type.name }}s</a>&nbsp;&nbsp;&nbsp;&nbsp;
+			 <a href="{% url 'create_part' type.id %}">Create New {{type.name }} Part</a><br><br>
+                    {% endfor %}
+            
+     
+    </div>
+{% endblock content %}
