@@ -4,7 +4,7 @@ from django.views.generic import ListView, TemplateView
 from mrp_system.models import Part, Type, Field, Manufacturer, Location
 from mrp_system.forms import (PartForm, ManufacturerForm,
 ManufacturerFormSet, FieldFormSet, TypeForm, TypeSelectForm)
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.forms.models import inlineformset_factory
 from django.urls import reverse, reverse_lazy
 from django.forms import ModelForm
@@ -41,6 +41,40 @@ def PartCreate(request, type_id):
         #self.object = None
         form = PartForm(type_id=type_id)
         part_formset = ManufacturerFormSet()
+    return render(request,'part_form.html',{'form': form,
+                                            'part_formset': part_formset,
+                                            'partType': partType})
+
+def PartEdit(request, type_id, id):
+##    model = GenericPart
+##    fields = '__all__'
+##    form_class = PartForm
+##    template_name = 'part_form.html'
+##    success_url = reverse_lazy('index')
+    partType = Type.objects.get(id=type_id)
+    instance = get_object_or_404(Part, id=id)
+    #relationship = get_object_or_404(ManufacturerRelationship
+
+    if request.method == 'POST':
+        #self.object = None
+        form = PartForm(type_id, request.POST, instance=instance)
+        #part_formset = ManufacturerFormSet(request.POST)
+        if form.is_valid(): # and part_formset.is_valid()):
+            part = form.save(commit=False)
+            part.partType_id = type_id
+            part_formset = ManufacturerFormSet(request.POST, instance=part)
+            if part_formset.is_valid():
+                part.save()
+                form.save_m2m()
+                #part_formset.instance = self_object
+           # part_formset = ManufacturerFromSet(request.POST, instance = self_object)
+                part_formset.save()
+                url = reverse('list_parts', args=[partType.pk])
+                return HttpResponseRedirect(url)
+    else:
+        #self.object = None
+        form = PartForm(type_id=type_id, instance=instance)
+        part_formset = ManufacturerFormSet(instance=instance)
     return render(request,'part_form.html',{'form': form,
                                             'part_formset': part_formset,
                                             'partType': partType})
@@ -112,6 +146,43 @@ class TypeCreate(CreateView):
         field_formset.instance = self.object
         field_formset.save()
         return super(TypeCreate, self).form_valid(form)
+
+    def form_invalid(self, form, part_formset):
+        return self.render_to_response(
+            self.get_context_data(form=form, field_formset=field_formset))
+
+class EditType(UpdateView):
+    model = Type
+    form_class = TypeForm
+    pk_url_kwarg = 'type_id'
+    template_name = 'type_form.html'
+    success_url = reverse_lazy('list_types')
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        field_formset = FieldFormSet(instance=self.object)
+        return self.render_to_response(
+            self.get_context_data(form=form, field_formset=field_formset))
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        field_formset = FieldFormSet(request.POST, instance=self.object)
+        if (form.is_valid() and field_formset.is_valid()):
+            return self.form_valid(form, field_formset)
+        else:
+            return self.form_invalid(form, field_formset)
+
+    def form_valid(self, form, field_formset):
+        self.object = form.save()
+        field_formset.instance = self.object
+        field_formset.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+       # return super(TypeEdit, self).form_valid(form)
 
     def form_invalid(self, form, part_formset):
         return self.render_to_response(

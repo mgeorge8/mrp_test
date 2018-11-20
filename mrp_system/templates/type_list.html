@@ -9,10 +9,26 @@
 <a href="{% url 'create_type' %}"> Create New Type</a>
 <hr>           
 <br> 
+<table class='table table-bordered table-striped table-condensed'>
+                <thead>
+                    <tr>
+                        <th>List Parts</th>
+                        <th>New Part</th>
+                        <th>Edit Type</th>
+                    </tr>
+                </thead>
+                <tbody>
                                 {% for type in object_list %}
-                        <a href="{% url 'list_parts' type.id %}">{{ type.name }}s</a>&nbsp;&nbsp;&nbsp;&nbsp;
-			 <a href="{% url 'create_part' type.id %}">Create New {{type.name }} Part</a><br><br>
+
+                        <tr>
+                            <td><a href="{% url 'list_parts' type.id %}">{{ type.name }}s</a></td>
+                            <td><a href="{% url 'create_part' type.id %}">New {{type.name }}</a></td>
+                            <td><a href="{% url 'edit_type' type.id %}">Edit {{type.name }} Model</a></td>
+                        </tr>
                     {% endfor %}
+                </tbody>
+            </table>
+
             
      
     </div>

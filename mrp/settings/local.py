@@ -40,9 +40,7 @@ INSTALLED_APPS = [
     'timepiece.apps.TimepieceConfig',
     'timepiece.manager',
     'timepiece.entries',
-    'inventory.apps.InventoryConfig',
     'mrp_system.apps.MrpSystemConfig',
-    'polymorphic',
 ]
 
 MIDDLEWARE = [

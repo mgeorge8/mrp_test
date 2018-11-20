@@ -28,6 +28,7 @@
 			{% for field in fields %}
 			<th>{{ field.name }}</th>
 			{% endfor %}
+			<th>Edit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,6 +42,7 @@
 			{% for field in fields %}
 			<td>{{ part|get_obj_attr:field.fields }}</td>
 			{% endfor %}
+			    <td><a class="btn btn-primary btn-sm" href="{% url 'edit_part' type.id part.id %}"> Edit</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
