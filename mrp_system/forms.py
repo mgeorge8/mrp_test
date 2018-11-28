@@ -1,6 +1,6 @@
 from django import forms
-from mrp_system.models import Location, Part, ManufacturerRelationship, Field, Type
-from django.forms import ModelForm
+from mrp_system.models import Bin, Part, ManufacturerRelationship, Field, Type
+from django.forms import ModelForm, BaseInlineFormSet
 from django.forms.models import inlineformset_factory
 
 FIELD_TYPES = {
@@ -69,7 +69,39 @@ class FieldForm(ModelForm):
             "fields": "Field Type"
         }
 
-FieldFormSet = inlineformset_factory(Type, Field, form=FieldForm, extra=4)
+class CustomInlineFormset(BaseInlineFormSet):
+    def clean(self):
+        if any(self.errors):
+            return
+
+        names = []
+        fields = []
+        duplicates = False
+        
+        for form in self.forms:
+           if form.cleaned_data:
+               name = form.cleaned_data['name']
+               field = form.cleaned_data['fields']
+
+               if name and field:
+                   if name in names:
+                       duplicates = True
+                   names.append(name)
+
+                   if field in fields:
+                       duplicates = True
+                   fields.append(field)
+
+               if duplicates:
+                   raise forms.ValidationError('Fields must have unique names and types.')
+               if name and not field:
+                   raise forms.ValidationError('All field names must have an associated type.')
+               elif field and not name:
+                   raise forms.ValidationError('All field names must have an associated type.')
+
+                        
+
+FieldFormSet = inlineformset_factory(Type, Field, form=FieldForm, extra=4, formset=CustomInlineFormset)
 
 class TypeSelectForm(forms.Form):
     partType = forms.ModelChoiceField(label='', queryset=Type.objects.order_by('name'),

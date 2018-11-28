@@ -4,6 +4,11 @@
 {% block title %}Parts{% endblock title %}
 
 {% block content %}
+{% if field_formset.non_form_errors %}
+        {% for error in field_formset.non_form_errors %}
+            <p><font color="red">{{ error }}</font> </p>
+        {% endfor %}
+    {% endif %}
 <div class="container-fluid">
 <div class="form-horizontal">
 <form action="" method="post">
@@ -14,6 +19,7 @@
 {% for form in field_formset %}
 {{ form }} <br>
 {% endfor %}
+
 <input type="submit" value="Save"/>
 </form>
 

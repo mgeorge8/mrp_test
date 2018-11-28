@@ -15,5 +15,9 @@
 
 </div>
 <hr/>
+<h4>Existing Manufacturers</h4>
+{% for manufacturer in manufacturers %}
+<li>{{ manufacturer.name }} </li>
+{% endfor %}
         </div>
 {% endblock content %}

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'timepiece.apps.TimepieceConfig',
+    'import_export'
     'timepiece.manager',
     'timepiece.entries',
     'mrp_system.apps.MrpSystemConfig',

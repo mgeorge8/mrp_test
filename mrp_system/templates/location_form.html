@@ -15,5 +15,9 @@
 
 </div>
 <hr/>
+<h4>Existing Locations</h4>
+{% for location in locations%}
+<li>{{ location.name}} </li>
+{% endfor %}
         </div>
 {% endblock content %}

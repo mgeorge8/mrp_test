@@ -24,7 +24,7 @@ urlpatterns = [
          views.CreateManufacturer.as_view(),
          name='create_manufacturer'),
     path('location/create/',
-         views.CreateLocation.as_view(),
+         views.CreateBin.as_view(),
          name='create_location'),
     
     

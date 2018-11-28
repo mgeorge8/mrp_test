@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, TemplateView
-from mrp_system.models import Part, Type, Field, Manufacturer, Location
+from mrp_system.models import Part, Type, Field, Manufacturer, Bin
 from mrp_system.forms import (PartForm, ManufacturerForm,
 ManufacturerFormSet, FieldFormSet, TypeForm, TypeSelectForm)
 from django.views.generic.edit import CreateView, UpdateView
@@ -147,7 +147,8 @@ class TypeCreate(CreateView):
         field_formset.save()
         return super(TypeCreate, self).form_valid(form)
 
-    def form_invalid(self, form, part_formset):
+    def form_invalid(self, form, field_formset):
+        #return super().form_invalid(form, field_formset)
         return self.render_to_response(
             self.get_context_data(form=form, field_formset=field_formset))
 
@@ -254,8 +255,16 @@ class CreateManufacturer(CreateView):
     template_name = 'manufacturer_form.html'
     success_url = reverse_lazy('list_types')
 
-class CreateLocation(CreateView):
-    model = Location
+    def get_context_data(self, **kwargs):
+        kwargs['manufacturers'] = Manufacturer.objects.order_by('name')
+        return super(CreateManufacturer, self).get_context_data(**kwargs)
+
+class CreateBin(CreateView):
+    model = Bin
     fields = ['name']
     template_name = 'location_form.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['locations'] = Bin.objects.order_by('name')
+        return super(CreateBin, self).get_context_data(**kwargs)
     success_url = reverse_lazy('list_types')

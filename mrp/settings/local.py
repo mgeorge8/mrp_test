@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'timepiece.apps.TimepieceConfig',
     'timepiece.manager',
     'timepiece.entries',
+    'import_export',
     'mrp_system.apps.MrpSystemConfig',
 ]
 
@@ -133,6 +134,8 @@ LOGOUT_REDIRECT_URL = 'auth_login'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
