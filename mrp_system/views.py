@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, TemplateView
-from mrp_system.models import Part, Type, Field, Manufacturer, Bin
+from mrp_system.models import Part, Type, Field, Manufacturer, Location
 from mrp_system.forms import (PartForm, ManufacturerForm,
 ManufacturerFormSet, FieldFormSet, TypeForm, TypeSelectForm)
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.forms.models import inlineformset_factory
 from django.urls import reverse, reverse_lazy
 from django.forms import ModelForm
@@ -13,6 +13,16 @@ from django import forms
 class TypeListView(ListView):
     model = Type
     template_name = 'type_list.html'
+
+class ManufacturerListView(ListView):
+    model = Manufacturer
+    template_name = 'manufacturer_list.html'
+    ordering = ['name']
+
+class LocationListView(ListView):
+    model = Location
+    template_name = 'location_list.html'
+    ordering = ['name']
     
 
 def PartCreate(request, type_id):
@@ -259,12 +269,63 @@ class CreateManufacturer(CreateView):
         kwargs['manufacturers'] = Manufacturer.objects.order_by('name')
         return super(CreateManufacturer, self).get_context_data(**kwargs)
 
-class CreateBin(CreateView):
-    model = Bin
+class CreateLocation(CreateView):
+    model = Location
     fields = ['name']
     template_name = 'location_form.html'
+    success_url = reverse_lazy('list_types')
 
     def get_context_data(self, **kwargs):
-        kwargs['locations'] = Bin.objects.order_by('name')
-        return super(CreateBin, self).get_context_data(**kwargs)
-    success_url = reverse_lazy('list_types')
+        kwargs['locations'] = Location.objects.order_by('name')
+        return super(CreateLocation, self).get_context_data(**kwargs)
+
+class ManufacturerUpdate(UpdateView):
+    model = Manufacturer
+    fields = ['name']
+    pk_url_kwarg = 'manufacturer_id'
+    template_name = 'update_manufacturer.html'
+    success_url = reverse_lazy('list_manufacturers')
+
+class LocationUpdate(UpdateView):
+    model = Location
+    fields = ['name']
+    pk_url_kwarg = 'location_id'
+    template_name = 'update_location.html'
+    success_url = reverse_lazy('list_locations')
+
+class ManufacturerDelete(DeleteView):
+    model = Manufacturer
+    pk_url_kwarg = 'manufacturer_id'
+    template_name = 'delete_manufacturer.html'
+    success_url = reverse_lazy('list_manufacturers')
+
+class LocationDelete(DeleteView):
+    model = Location
+    pk_url_kwarg = 'location_id'
+    template_name = 'delete_location.html'
+    success_url = reverse_lazy('list_locations')
+
+##def merge(primary_object, alias_object):
+##    if not isinstance(alias_object, Manufacturer):
+##        raise TypeError('Only Manufacturer instances can be merged')
+##    
+##    if not isinstance(primary_object, Manufacturer):
+##        raise TypeError('Only Manufacturer instances can be merged')
+##
+##    parts = alias_object.part_set.all()
+##    partNumber = []
+##    partSet = []
+##    for part in parts:
+##        m = ManufacturerRelationship.objects.get(part=part, manufacturer=alias_object)
+##        partNumber.append(m.partNumber)
+##        partSet.append(m.part)
+##    alias_object.part_set.clear()
+##    length = len(partSet)
+##    for x in range(length):
+##        ManufacturerRelationship.objects.create(part=partSet[x],
+##                                                manufacturer=primary_object,
+##                                                partNumber=partNumber[x])
+
+
+
+    

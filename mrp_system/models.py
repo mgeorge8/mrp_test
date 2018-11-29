@@ -6,7 +6,7 @@ class Manufacturer(models.Model):
     def __str__(self):
         return self.name
 
-class Bin(models.Model):
+class Location(models.Model):
     name = models.CharField(max_length=30)
 
     def __str__(self):
@@ -36,7 +36,7 @@ class Part(models.Model):
     partType = models.ForeignKey(Type, on_delete=models.CASCADE, related_name="part")
     partNumber = models.CharField(max_length=30)
     description = models.CharField(max_length=100)
-    location = models.ManyToManyField(Bin)
+    location = models.ManyToManyField(Location)
     manufacturer = models.ManyToManyField(Manufacturer,
                                           through='ManufacturerRelationship')
     char1 = models.CharField(max_length=100, blank=True)

@@ -1,5 +1,5 @@
 from django import forms
-from mrp_system.models import Bin, Part, ManufacturerRelationship, Field, Type
+from mrp_system.models import Location, Part, ManufacturerRelationship, Field, Type
 from django.forms import ModelForm, BaseInlineFormSet
 from django.forms.models import inlineformset_factory
 

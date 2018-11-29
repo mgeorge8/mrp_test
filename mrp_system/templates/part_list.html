@@ -2,7 +2,10 @@
 {% load mrp_tags %}
 
 {% block title %}Parts{% endblock title %}
-
+{% block crumbs %}
+    {{ block.super }}
+    <li><span class="divider">/</span> <a href="">{{ type }}</a></li>
+{% endblock crumbs %}
 {% block content %}
 
 <div class="container-fluid">
