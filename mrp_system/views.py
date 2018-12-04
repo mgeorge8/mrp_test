@@ -1,14 +1,18 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, TemplateView
-from mrp_system.models import Part, Type, Field, Manufacturer, Location
-from mrp_system.forms import (PartForm, ManufacturerForm,
-ManufacturerFormSet, FieldFormSet, TypeForm, TypeSelectForm)
+from mrp_system.models import (Part, Type, Field, Manufacturer,
+                               ManufacturerRelationship, Location)
+from mrp_system.forms import (FilterForm, PartForm, MergeLocationsForm, ManufacturerForm,
+ManufacturerFormSet, MergeManufacturersForm, FieldFormSet, TypeForm, TypeSelectForm)
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.forms.models import inlineformset_factory
 from django.urls import reverse, reverse_lazy
 from django.forms import ModelForm
 from django import forms
+from django.db.models.functions import Cast
+from django.db.models import CharField
+from django.contrib.postgres.search import SearchVector
 
 class TypeListView(ListView):
     model = Type
@@ -226,44 +230,110 @@ class PartListView(ListView):
 
         return part_list
 
-class ListParts(TemplateView):
-    template_name = 'part_list.html'
-
-    def post(self, request, *args, **kwargs):
-        context = self.get_context_data()
-        if context['form'].is_valid():
-            print ('yes done')
-            partType = context['form'].save()
-            
-            url = reverse('list_parts', args=[partType.pk])
-            #url = request.GET.get('next', reverse('dashboard'))
-            return HttpResponseRedirect(url)
-            #return redirect('week_timesheet', user_id=entry.pk)
-        return super(ListParts, self).render_to_response(context)
+def ListParts(request, type_id):
+    filters={}
+    partType = Type.objects.get(id=type_id)
+    parts = Part.objects.filter(partType=partType)
+    fields = Field.objects.filter(typePart_id=type_id)
+    typeName = partType.name
+    searchField = None
+    models={}
+    for field in fields:
+        models[field.fields] = field.name
+    if request.method == 'POST':
+        form = FilterForm(request.POST, models=models, typeName=typeName)
+        manufacturer = request.POST.getlist('manufacturer')
+        location = request.POST.getlist('location')
+        char1 = request.POST.getlist('char1')
+        char2 = request.POST.getlist('char2')
+        integer1 = request.POST.getlist('integer1')
+        integer2 = request.POST.getlist('integer2')
+        searchField = request.POST.get('search')
+        if len(manufacturer) > 0:
+            filters['manufacturer__in'] = manufacturer
+        if len(location) > 0:
+            filters['location__in'] = location
+        if len(char1) > 0:
+            filters['char1__in'] = char1
+        if len(char2) > 0:
+            filters['char2__in'] = char2
+        if len(integer1) > 0:
+            filters['integer1__in'] = integer1
+        if len(integer2) > 0:
+            filters['integer2'] = integer2
+        form=FilterForm(models=models, typeName=typeName)
+    else:
+        form = FilterForm(models=models, typeName=typeName)
+    parts = parts.filter(**filters)
+    if searchField == "" or searchField is None:
+        print(searchField)
+        print("not")
+        parts = parts.distinct('id')
+    else:
+        print(searchField)
+        print("none")
+        parts = parts.annotate(search=SearchVector('manufacturer__name', 'location__name', 'char1', 'char2', Cast('integer1', CharField()), Cast('integer2', CharField()))).filter(search=searchField)
+        parts = parts.distinct('id')
     
-    def get_context_data(self, *args, **kwargs):
-        context = super(ListParts, self).get_context_data(**kwargs)
-
-        form = TypeSelectForm(self.request.POST or None)
-        
-        type_id = self.kwargs['type_id']
-        partType = Type.objects.get(id=type_id)
-        parts = Part.objects.filter(partType=partType)
-        fields = Field.objects.filter(typePart_id=type_id)
-
-        context.update({
-            'type': partType,
-            'parts': parts,
-            'fields': fields,
-            'form': form,
-            })
-        return context
+    return render(request, 'part_list.html', {'type': partType, 'parts': parts,
+                                              'fields': fields, 'form': form})
+    
+##class ListParts(TemplateView):
+##    template_name = 'part_list.html'
+##
+##    def post(self, request, *args, **kwargs):
+##        context = self.get_context_data()
+####        if context['form'].is_valid():
+####            print ('yes done')
+####            #context['form'].save()
+####            
+####            url = reverse('list_parts', args=[partType.pk])
+####            #url = request.GET.get('next', reverse('dashboard'))
+####            return HttpResponseRedirect(url)
+##            #return redirect('week_timesheet', user_id=entry.pk)
+##        return super(ListParts, self).render_to_response(context)
+##    
+##    def get_context_data(self, *args, **kwargs):
+##        context = super(ListParts, self).get_context_data(**kwargs)
+####        filters = {}
+####
+####        for key, value in self.kwargs.items():
+####            if key in ['location', 'manufacturer', 'char1', 'char2', 'integer1', 'integer2']:
+####                filters[key] = value
+##
+##        #Test.objects.filter(**filters)
+##        filter_names = ('location', 'manufacturer', 'char1')
+##
+##       # queryset = Books.objects.all(); 
+##        filter_clauses = [Q(filter=self.kwargs[filter])
+##                      for filter in filter_names
+##                      if self.kwargs[filter]]
+####        if filter_clauses:
+####            queryset = queryset.filter(reduce(operator.and_, filter_clauses))       
+##        #form = TypeSelectForm(self.request.POST or None)
+##        form = FilterForm(self.request.POST or None)
+##        type_id = self.kwargs['type_id']
+##        partType = Type.objects.get(id=type_id)
+##        man = Manufacturer.objects.get(name="manu1")
+##        parts = Part.objects.filter(partType=partType)
+##        if filter_clauses:
+##            parts = parts.filter(reduce(operator.and_, filter_clauses))
+##        #parts = parts.filter(**filters)
+##        fields = Field.objects.filter(typePart_id=type_id)
+##
+##        context.update({
+##            'type': partType,
+##            'parts': parts,
+##            'fields': fields,
+##            'form': form,
+##            })
+##        return context
 
 class CreateManufacturer(CreateView):
     model = Manufacturer
     fields = ['name']
     template_name = 'manufacturer_form.html'
-    success_url = reverse_lazy('list_types')
+    success_url = reverse_lazy('list_manufacturers')
 
     def get_context_data(self, **kwargs):
         kwargs['manufacturers'] = Manufacturer.objects.order_by('name')
@@ -273,7 +343,7 @@ class CreateLocation(CreateView):
     model = Location
     fields = ['name']
     template_name = 'location_form.html'
-    success_url = reverse_lazy('list_types')
+    success_url = reverse_lazy('list_locations')
 
     def get_context_data(self, **kwargs):
         kwargs['locations'] = Location.objects.order_by('name')
@@ -305,26 +375,56 @@ class LocationDelete(DeleteView):
     template_name = 'delete_location.html'
     success_url = reverse_lazy('list_locations')
 
-##def merge(primary_object, alias_object):
-##    if not isinstance(alias_object, Manufacturer):
-##        raise TypeError('Only Manufacturer instances can be merged')
-##    
-##    if not isinstance(primary_object, Manufacturer):
-##        raise TypeError('Only Manufacturer instances can be merged')
-##
-##    parts = alias_object.part_set.all()
-##    partNumber = []
-##    partSet = []
-##    for part in parts:
-##        m = ManufacturerRelationship.objects.get(part=part, manufacturer=alias_object)
-##        partNumber.append(m.partNumber)
-##        partSet.append(m.part)
-##    alias_object.part_set.clear()
-##    length = len(partSet)
-##    for x in range(length):
-##        ManufacturerRelationship.objects.create(part=partSet[x],
-##                                                manufacturer=primary_object,
-##                                                partNumber=partNumber[x])
+def MergeManufacturerView(request):
+    if request.method == "POST":
+        form = MergeManufacturersForm(request.POST)
+        if form.is_valid():
+            primary_object = form.cleaned_data['primary']
+            alias_object = form.cleaned_data['alias']
+            MergeManufacturer(primary_object, alias_object)
+            return redirect('list_manufacturers')
+    else: form = MergeManufacturersForm()
+    return render(request, "merge_manufacturers.html", {"form":form})
+
+def MergeManufacturer(primary_object, alias_object):
+    if not isinstance(alias_object, Manufacturer):
+        raise TypeError('Only Manufacturer instances can be merged')
+    
+    if not isinstance(primary_object, Manufacturer):
+        raise TypeError('Only Manufacturer instances can be merged')
+
+    parts = alias_object.part_set.all()
+    partNumber = []
+    partSet = []
+    for part in parts:
+        m = ManufacturerRelationship.objects.get(part=part, manufacturer=alias_object)
+        partNumber.append(m.partNumber)
+        partSet.append(m.part)
+    alias_object.part_set.clear()
+    length = len(partSet)
+    for x in range(length):
+        ManufacturerRelationship.objects.create(part=partSet[x],
+                                                manufacturer=primary_object,
+                                                partNumber=partNumber[x])
+    alias_object.delete()
+
+def MergeLocationView(request):
+    if request.method == "POST":
+        form = MergeLocationsForm(request.POST)
+        if form.is_valid():
+            primary_object = form.cleaned_data['primary']
+            alias_object = form.cleaned_data['alias']
+            MergeLocation(primary_object, alias_object)
+            return redirect('list_locations')
+    else: form = MergeLocationsForm()
+    return render(request, "merge_locations.html", {"form":form})
+
+def MergeLocation(primary_object, alias_object):
+    parts = alias_object.part_set.all()
+    for part in parts:
+        part.location.add(primary_object)
+        part.location.filter(id=alias_object.id).delete()
+        
 
 
 

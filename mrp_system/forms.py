@@ -1,5 +1,5 @@
 from django import forms
-from mrp_system.models import Location, Part, ManufacturerRelationship, Field, Type
+from mrp_system.models import Location, Part, Manufacturer, ManufacturerRelationship, Field, Type
 from django.forms import ModelForm, BaseInlineFormSet
 from django.forms.models import inlineformset_factory
 
@@ -109,4 +109,36 @@ class TypeSelectForm(forms.Form):
 
     def save(self):
         return (self.cleaned_data.get('partType'))
+
+class MergeManufacturersForm(forms.Form):
+        primary = forms.ModelChoiceField(label='Primary Manufacturer',
+                                         queryset = Manufacturer.objects.order_by('name'))
+        alias = forms.ModelChoiceField(label='Manufacturer To Delete',
+                                         queryset = Manufacturer.objects.order_by('name'))
+
+class MergeLocationsForm(forms.Form):
+        primary = forms.ModelChoiceField(label='Primary Location',
+                                         queryset = Location.objects.order_by('name'))
+        alias = forms.ModelChoiceField(label='Location To Delete',
+                                         queryset = Location.objects.order_by('name'))
+
+class FilterForm(forms.Form):
+        def __init__(self,*args,**kwargs):
+                models = kwargs.pop('models')
+                typeName = kwargs.pop('typeName')
+                super(FilterForm, self).__init__(*args, **kwargs)
+                self.fields['location'].queryset = Location.objects.filter(part__partType=Type.objects.get(name=typeName)).distinct()
+                self.fields['manufacturer'].queryset = Manufacturer.objects.filter(part__partType=Type.objects.get(name=typeName)).distinct()
+                for field, name in models.items():
+                        self.fields[field] = forms.ModelMultipleChoiceField(Part.objects.all().values_list(field, flat=True).distinct(), required=False)
+                        self.fields[field].label = name
+                
+        search = forms.CharField(required=False)
+        location = forms.ModelMultipleChoiceField(required=False, queryset = Location.objects.none())
+        manufacturer = forms.ModelMultipleChoiceField(required=False, queryset = Manufacturer.objects.none())
+##        char1 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
+##        char2 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
+##        integer1 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
+##        integer2 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
+     
         

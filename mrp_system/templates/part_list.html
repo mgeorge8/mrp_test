@@ -4,6 +4,7 @@
 {% block title %}Parts{% endblock title %}
 {% block crumbs %}
     {{ block.super }}
+   <li><span class="divider">/</span> <a href="{% url 'list_types' %}">Parts</a></li>
     <li><span class="divider">/</span> <a href="">{{ type }}</a></li>
 {% endblock crumbs %}
 {% block content %}
@@ -16,6 +17,7 @@
 <form action="" method="post">
 {% csrf_token %}
 {{ form }}
+<input type="submit" value="Filter"/>
 </form>
 </div>
 <hr/>

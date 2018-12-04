@@ -11,7 +11,7 @@ urlpatterns = [
         name='edit_type'),
     
     url(r'^parts/(?P<type_id>\d+)/$',
-        views.ListParts.as_view(),
+        views.ListParts,#.as_view(),
         name='list_parts'),
     url(r'^part/create/(?P<type_id>\d+)/$',
         views.PartCreate,
@@ -44,6 +44,12 @@ urlpatterns = [
     url('location/delete/(?P<location_id>\d+)/$',
         views.LocationDelete.as_view(),
         name='delete_location'),
+    url('manufacturer/merge/',
+        views.MergeManufacturerView,
+        name='merge_manufacturers'),
+    url('location/merge/',
+        views.MergeLocationView,
+        name='merge_locations'),
     
     
 ]
