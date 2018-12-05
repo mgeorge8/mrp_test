@@ -13,6 +13,11 @@ from django import forms
 from django.db.models.functions import Cast
 from django.db.models import CharField
 from django.contrib.postgres.search import SearchVector
+from django.core.files.storage import DefaultStorage
+
+def view_file(request, name):
+    storage = DefaultStorage()
+    f = storage.open(part.document.name, mode='rb')
 
 class TypeListView(ListView):
     model = Type
@@ -39,11 +44,12 @@ def PartCreate(request, type_id):
 
     if request.method == 'POST':
         #self.object = None
-        form = PartForm(type_id, request.POST)
+        form = PartForm(type_id, request.POST, request.FILES)
         part_formset = ManufacturerFormSet(request.POST)
         if (form.is_valid() and part_formset.is_valid()):
             self_object = form.save(commit=False)
             self_object.partType_id = type_id
+           # self_object.document = request.FILES['document']
             self_object.save()
             form.save_m2m()
             part_formset.instance = self_object

@@ -50,6 +50,8 @@ urlpatterns = [
     url('location/merge/',
         views.MergeLocationView,
         name='merge_locations'),
-    
+    url('file/(?P<name>\d+)/$',
+        views.view_file,
+        name='view_file'),
     
 ]

@@ -25,6 +25,7 @@
             <table class='table table-bordered table-striped table-condensed'>
                 <thead>
                     <tr>
+			<th>PDF</th>
                         <th>Number</th>
                         <th>Description</th>
                         <th>Location</th>
@@ -38,7 +39,8 @@
                 </thead>
                 <tbody>
                     {% for part in parts %}
-                        <tr>
+                        <tr><td>{% if part.document %}
+			    <li><a href="{{part.document.url}}">{{ part.document.name }}</a></li{% endif %}</td>
                             <td>{{ part.partNumber }}</td>
                             <td>{{ part.description }}</td>
                             <td>{{ part.get_location }}</td>

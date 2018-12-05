@@ -43,6 +43,7 @@ class Part(models.Model):
     char2 = models.CharField(max_length=100, blank=True)
     integer1 = models.IntegerField(blank=True, null=True)
     integer2 = models.IntegerField(blank=True, null=True)
+    document = models.FileField(upload_to='documents/', blank=True)
     #inStock = models.IntegerField()
     #package = models.CharField(max_length=30)
 
