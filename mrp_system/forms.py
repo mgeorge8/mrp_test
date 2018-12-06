@@ -1,17 +1,29 @@
 from django import forms
-from mrp_system.models import Location, Part, Manufacturer, ManufacturerRelationship, Field, Type
+from mrp_system.models import Location, LocationRelationship, Part, Manufacturer, ManufacturerRelationship, Field, Type
 from django.forms import ModelForm, BaseInlineFormSet
 from django.forms.models import inlineformset_factory
 
 FIELD_TYPES = {
     'char1': forms.CharField,
     'char2': forms.CharField,
+    'char3': forms.CharField,
+    'char4': forms.CharField,
+    'char5': forms.CharField,
+    'char6': forms.CharField,
+    'char7': forms.CharField,
+    'char8': forms.CharField,
     'integer1': forms.IntegerField,
     'integer2': forms.IntegerField
     }
 FIELDS_F = {
     'char1': 'char1',
     'char2': 'char2',
+    'char3': 'char3',
+    'char4': 'char4',
+    'char5': 'char5',
+    'char6': 'char6',
+    'char7': 'char7',
+    'char8': 'char8',
     'integer1': 'integer1',
     'integer2': 'integer2'
     }
@@ -34,14 +46,15 @@ class PartForm(ModelForm):
                 #self.fields[field.name] = FIELD_TYPES[field.fields](label = field.name)
                 self.fields[FIELDS_F[field.fields]].label = field.name
             #parts = partType.field.all()
-            extra_fields = ('char1', 'char2', 'integer1', 'integer2')
+            extra_fields = ('char1', 'char2', 'char3', 'char4', 'char5', 'char6',
+                            'char7', 'char8','integer1', 'integer2')
             for field in extra_fields:
                 if field not in partType.field.values_list('fields', flat=True):
                     self.fields.pop(field)
             
         class Meta:
             model = Part
-            exclude = ('manufacturer', 'partType')
+            exclude = ('manufacturer', 'location', 'partType')
             
 
 class ManufacturerForm(ModelForm):
@@ -50,7 +63,16 @@ class ManufacturerForm(ModelForm):
         exclude = ('part',)
     
 ManufacturerFormSet = inlineformset_factory(Part, ManufacturerRelationship,
-                                            form=ManufacturerForm, extra=1)
+                                            form=ManufacturerForm, extra=3)
+
+class LocationForm(ModelForm):
+    class Meta:
+        model = LocationRelationship
+        exclude = ('part',)
+        
+LocationFormSet = inlineformset_factory(Part, LocationRelationship,
+                                        form=LocationForm, extra=3)
+        
 
 class TypeForm(ModelForm):
     class Meta:
@@ -101,7 +123,8 @@ class CustomInlineFormset(BaseInlineFormSet):
 
                         
 
-FieldFormSet = inlineformset_factory(Type, Field, form=FieldForm, extra=4, formset=CustomInlineFormset)
+FieldFormSet = inlineformset_factory(Type, Field, form=FieldForm, extra=10, max_num=10,
+                                     formset=CustomInlineFormset)
 
 class TypeSelectForm(forms.Form):
     partType = forms.ModelChoiceField(label='', queryset=Type.objects.order_by('name'),

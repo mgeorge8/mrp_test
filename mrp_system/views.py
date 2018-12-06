@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, TemplateView
 from mrp_system.models import (Part, Type, Field, Manufacturer,
                                ManufacturerRelationship, Location)
-from mrp_system.forms import (FilterForm, PartForm, MergeLocationsForm, ManufacturerForm,
+from mrp_system.forms import (FilterForm, PartForm, LocationForm, LocationFormSet, MergeLocationsForm, ManufacturerForm,
 ManufacturerFormSet, MergeManufacturersForm, FieldFormSet, TypeForm, TypeSelectForm)
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.forms.models import inlineformset_factory
@@ -46,12 +46,15 @@ def PartCreate(request, type_id):
         #self.object = None
         form = PartForm(type_id, request.POST, request.FILES)
         part_formset = ManufacturerFormSet(request.POST)
-        if (form.is_valid() and part_formset.is_valid()):
+        location_formset = LocationFormSet(request.POST)
+        if (form.is_valid() and part_formset.is_valid() and location_formset.is_valid()):
             self_object = form.save(commit=False)
             self_object.partType_id = type_id
            # self_object.document = request.FILES['document']
             self_object.save()
-            form.save_m2m()
+            #form.save_m2m()
+            location_formset.instance = self_object
+            location_formset.save()
             part_formset.instance = self_object
            # part_formset = ManufacturerFromSet(request.POST, instance = self_object)
             part_formset.save()
@@ -61,7 +64,9 @@ def PartCreate(request, type_id):
         #self.object = None
         form = PartForm(type_id=type_id)
         part_formset = ManufacturerFormSet()
+        location_formset = LocationFormSet()
     return render(request,'part_form.html',{'form': form,
+                                            'location_formset': location_formset,
                                             'part_formset': part_formset,
                                             'partType': partType})
 
@@ -83,60 +88,25 @@ def PartEdit(request, type_id, id):
             part = form.save(commit=False)
             part.partType_id = type_id
             part_formset = ManufacturerFormSet(request.POST, instance=part)
-            if part_formset.is_valid():
+            location_formset = LocationFormSet(request.POST, instance=part)
+            if part_formset.is_valid() and location_formset.is_valid():
                 part.save()
-                form.save_m2m()
+                #form.save_m2m()
                 #part_formset.instance = self_object
            # part_formset = ManufacturerFromSet(request.POST, instance = self_object)
                 part_formset.save()
+                location_formset.save()
                 url = reverse('list_parts', args=[partType.pk])
                 return HttpResponseRedirect(url)
     else:
         #self.object = None
         form = PartForm(type_id=type_id, instance=instance)
         part_formset = ManufacturerFormSet(instance=instance)
+        location_formset = LocationFormSet(instance=instance)
     return render(request,'part_form.html',{'form': form,
+                                            'location_formset': location_formset,
                                             'part_formset': part_formset,
                                             'partType': partType})
-
-        
-
-##class PartCreate(CreateView):
-####    model = GenericPart
-####    fields = '__all__'
-##    form_class = PartForm
-##    template_name = 'part_form.html'
-##    success_url = reverse_lazy('index')
-##
-##    def get(self, request, *args, **kwargs):
-##        self.object = None
-##        form_class = self.get_form_class()
-##        form = self.get_form(form_class)
-##        part_formset = ManufacturerFormSet()
-##        return self.render_to_response(
-##            self.get_context_data(form=form, part_formset=part_formset))
-##
-##    def post(self, request, *args, **kwargs):
-##        self.object = None
-##        form_class = self.get_form_class()
-##        form = self.get_form(form_class)
-##        part_formset = ManufacturerFormSet(request.POST)
-##        if (form.is_valid() and part_formset.is_valid()):
-##            return self.form_valid(form, part_formset)
-##        else:
-##            return self.form_invalid(form, part_formset)
-##
-##    def form_valid(self, form, part_formset):
-##        self.object = form.save()
-##        part_formset.instance = self.object
-##        part_formset.save()
-##        return super(PartCreate, self).form_valid(form)
-##
-##    def form_invalid(self, form, part_formset):
-##        return self.render_to_response(
-##            self.get_context_data(form=form,part_formset=part_formset))
-
-
 
 class TypeCreate(CreateView):
     form_class = TypeForm
@@ -266,7 +236,7 @@ def ListParts(request, type_id):
         if len(integer1) > 0:
             filters['integer1__in'] = integer1
         if len(integer2) > 0:
-            filters['integer2'] = integer2
+            filters['integer2__in'] = integer2
         form=FilterForm(models=models, typeName=typeName)
     else:
         form = FilterForm(models=models, typeName=typeName)

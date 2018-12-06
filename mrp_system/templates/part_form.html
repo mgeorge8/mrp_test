@@ -14,7 +14,14 @@
 {% csrf_token %}
 {{ form.as_p }}
 {% csrf_token %}
-{{ part_formset }}
+{{ location_formset.management_form }}
+{% for form in location_formset %}
+{{ form }} <br>
+{% endfor %}
+{{ part_formset.management_form }}
+{% for form in part_formset %}
+{{ form }} <br>
+{% endfor %}
 <input type="submit" value="Save"/>
 </form>
 

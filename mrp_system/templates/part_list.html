@@ -25,10 +25,11 @@
             <table class='table table-bordered table-striped table-condensed'>
                 <thead>
                     <tr>
-			<th>PDF</th>
+			<th>Engimusing Part Number</th>
+			<th>Datasheet</th>
                         <th>Number</th>
                         <th>Description</th>
-                        <th>Location</th>
+                        <th>Location - In Stock</th>
 			<th>Manufacturer</th>
 			 <th>Part Number</th>
 			{% for field in fields %}
@@ -39,8 +40,10 @@
                 </thead>
                 <tbody>
                     {% for part in parts %}
-                        <tr><td>{% if part.document %}
-			    <a href="{{part.document.url}}">PDF</a>{% endif %}</td>
+                        <tr>
+			<td>{{part.engimusingPartNumber}}</td>
+			<td>{% if part.datasheet %}
+			    <a href="{{part.datasheet.url}}" target="_new">PDF</a>{% endif %}</td>
                             <td>{{ part.partNumber }}</td>
                             <td>{{ part.description }}</td>
                             <td>{{ part.get_location }}</td>

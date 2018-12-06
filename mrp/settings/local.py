@@ -142,8 +142,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-AWS_ACCESS_KEY_ID = #'AKIAJNKT2CMOJ6SR6IUA'
-AWS_SECRET_ACCESS_KEY = #'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'
+AWS_ACCESS_KEY_ID = os.environ['access_key']
+AWS_SECRET_ACCESS_KEY = os.environ['secret_access_key']
 AWS_STORAGE_BUCKET_NAME = 'emus-mrp'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
