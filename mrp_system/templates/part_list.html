@@ -40,7 +40,7 @@
                 <tbody>
                     {% for part in parts %}
                         <tr><td>{% if part.document %}
-			    <a href="{{part.document.url}}">{{ part.document.name }}</a>{% endif %}</td>
+			    <a href="{{part.document.url}}">PDF</a>{% endif %}</td>
                             <td>{{ part.partNumber }}</td>
                             <td>{{ part.description }}</td>
                             <td>{{ part.get_location }}</td>
