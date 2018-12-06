@@ -142,8 +142,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-AWS_ACCESS_KEY_ID = 'AKIAIEBSAGEXTQXVEO3A'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = #'AKIAJNKT2CMOJ6SR6IUA'
+AWS_SECRET_ACCESS_KEY = #'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'
 AWS_STORAGE_BUCKET_NAME = 'emus-mrp'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
@@ -156,6 +156,7 @@ DEFAULT_FILE_STORAGE = 'mrp.settings.custom_storages.MediaStorage'
 
 STATICFILES_LOCATION = 'static'
 STATICFILES_STORAGE = 'mrp.settings.custom_storages.StaticStorage'
+
 #STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 
 #DEFAULT_FILE_STORAGE = 'mrp.settings.storage_backends.MediaStorage' 
