@@ -77,7 +77,7 @@ def PartEdit(request, type_id, id):
 
     if request.method == 'POST':
         #self.object = None
-        form = PartForm(type_id, request.POST, instance=instance)
+        form = PartForm(type_id, request.POST, request.FILES, instance=instance)
         #part_formset = ManufacturerFormSet(request.POST)
         if form.is_valid(): # and part_formset.is_valid()):
             part = form.save(commit=False)
