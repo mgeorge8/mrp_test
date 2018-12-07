@@ -7,7 +7,7 @@ class Manufacturer(models.Model):
         return self.name
 
 class Location(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
@@ -35,8 +35,8 @@ class Field(models.Model):
         ('integer1', 'Integer 1'),
         ('integer2', 'Integer 2'),
     )
-    name = models.CharField(max_length=20)
-    fields = models.CharField(max_length=15, choices=FIELD_CHOICES)
+    name = models.CharField(max_length=50)
+    fields = models.CharField(max_length=50, choices=FIELD_CHOICES)
     typePart = models.ForeignKey(Type, on_delete=models.CASCADE, related_name="field", null=True)
 
 class Part(models.Model):
@@ -48,14 +48,14 @@ class Part(models.Model):
     location = models.ManyToManyField(Location, through='LocationRelationship')
     manufacturer = models.ManyToManyField(Manufacturer,
                                           through='ManufacturerRelationship')
-    char1 = models.CharField(max_length=30, blank=True)
-    char2 = models.CharField(max_length=30, blank=True)
-    char3 = models.CharField(max_length=30, blank=True)
-    char4 = models.CharField(max_length=30, blank=True)
-    char5 = models.CharField(max_length=30, blank=True)
-    char6 = models.CharField(max_length=30, blank=True)
-    char7 = models.CharField(max_length=30, blank=True)
-    char8 = models.CharField(max_length=30, blank=True)
+    char1 = models.CharField(max_length=100, blank=True)
+    char2 = models.CharField(max_length=100, blank=True)
+    char3 = models.CharField(max_length=100, blank=True)
+    char4 = models.CharField(max_length=100, blank=True)
+    char5 = models.CharField(max_length=100, blank=True)
+    char6 = models.CharField(max_length=100, blank=True)
+    char7 = models.CharField(max_length=100, blank=True)
+    char8 = models.CharField(max_length=100, blank=True)
     integer1 = models.IntegerField(blank=True, null=True)
     integer2 = models.IntegerField(blank=True, null=True)
     datasheet = models.FileField(upload_to='documents/', blank=True)
