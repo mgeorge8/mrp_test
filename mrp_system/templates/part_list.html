@@ -13,45 +13,68 @@
 <h2>{{ type }} Parts</h2>
 <a href="{% url 'create_part' type.id %}">Create new {{ type }}</a>
 <br><br>
-<div class="form-horizontal">
 <form action="" method="post">
 {% csrf_token %}
-{{ form }}
+{% for field in form.visible_fields %}
+    <div class="group">
+     {{ field.label_tag }}
+      {{field}}
+    </div>
+  {% endfor %}
 <input type="submit" value="Filter"/>
 </form>
-</div>
 <hr/>
             
             <table class='table table-bordered table-striped table-condensed'>
                 <thead>
                     <tr>
 			<th>Engimusing Part Number</th>
-			<th>Datasheet</th>
-                        <th>Number</th>
+			{% if type.name == "Resistor" %}
+<th>Resistance</th>{% endif %}
                         <th>Description</th>
-                        <th>Location - In Stock</th>
+			<th>Datasheet</th>
+                        <th>Location</th>
+			<th>In Stock</th>
 			<th>Manufacturer</th>
 			 <th>Part Number</th>
+{% if type.name == "Resistor" %}
+{% for field in fields %}
+{% if field.name != "Resistance" %}
+<th>{{ field.name }}</th>
+{% endif %}
+{% endfor %}
+{% else %}
 			{% for field in fields %}
 			<th>{{ field.name }}</th>
 			{% endfor %}
+{% endif %}
 			<th>Edit</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for part in parts %}
                         <tr>
-			<td>{{part.engimusingPartNumber}}</td>
+			<td>{{part.engimusingPartNumber}}</td>	
+{% if type.name == "Resistor" %} <td>{{part.integer1}}</td>{% endif %}	
+                            <td>{{ part.description }}</td>
 			<td>{% if part.datasheet %}
 			    <a href="{{part.datasheet.url}}" target="_new">PDF</a>{% endif %}</td>
-                            <td>{{ part.partNumber }}</td>
-                            <td>{{ part.description }}</td>
                             <td>{{ part.get_location }}</td>
-			     <td>{{ part.get_manufacturers }}</td>
-			     <td>{{ part.get_related }} </td>
+			    <td>{% for stock in part.get_stock %}{{ stock }}</br>{% endfor %}</td>
+			     <td>{% for manu in part.get_manufacturers %}{{ manu }}</br>{% endfor %}</td>
+			     <td>{% for number in part.get_related %}{{ number }}</br>{% endfor %} </td>
+{% if type.name == "Resistor" %}
+{% for field in fields %}
+{% if field.fields != "integer1" %}
+			<td>{{ part|get_obj_attr:field.fields }}</td>
+{% endif %}
+			{% endfor %}
+{% else %}
 			{% for field in fields %}
 			<td>{{ part|get_obj_attr:field.fields }}</td>
 			{% endfor %}
+{% endif %}
+			
 			    <td><a class="btn btn-primary btn-sm" href="{% url 'edit_part' type.id part.id %}"> Edit</a></td>
                         </tr>
                     {% endfor %}

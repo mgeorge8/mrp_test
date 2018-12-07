@@ -69,18 +69,24 @@ class Part(models.Model):
         if self.location:
             #return self.location.all()
             #return '%s' % "-" % '%s' % " / ".join([location.name for location in self.location.all()])
-            return '%s' % "\n".join([LocationRelationship.location.name + " - " + str(LocationRelationship.stock) for LocationRelationship
+            return '%s' % '\n'.join([LocationRelationship.location.name for LocationRelationship
                                      in self.locationrelationship_set.all()])
-                                     
+
+    def get_stock(self):
+        if self.location:
+            #return '\n'.join([str(LocationRelationship.stock) for LocationRelationship
+             #                            in self.locationrelationship_set.all()])
+            return [str(LocationRelationship.stock) for LocationRelationship in
+                    self.locationrelationship_set.all()]
 
     def get_manufacturers(self):
         if self.manufacturer:
-            return '%s' % " / ".join([manufacturer.name for manufacturer in self.manufacturer.all()])
+            return [manufacturer.name for manufacturer in self.manufacturer.all()]
 
     def get_related(self):
         if self.manufacturer:
-            return '%s' % " / ".join([str(ManufacturerRelationship.partNumber) for ManufacturerRelationship
-                                      in self.manufacturerrelationship_set.all()]) #.objects.get(part=self)])
+            return [str(ManufacturerRelationship.partNumber) for ManufacturerRelationship
+                                      in self.manufacturerrelationship_set.all()] #.objects.get(part=self)])
 
     def save(self, *args, **kwargs):
         if not self.id:

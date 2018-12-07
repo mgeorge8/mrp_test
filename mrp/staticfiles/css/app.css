@@ -5,3 +5,7 @@
 .navbar-text {
    color: white;
  }
+
+.group{
+	display: inline-block;
+}
