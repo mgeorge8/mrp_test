@@ -70,7 +70,7 @@
 			     <td>{% for number in part.get_related %}{{ number }}</br>{% endfor %} </td>
 {% if type.name == "Resistor" %}
 {% for field in fields %}
-{% if field.fields != "integer1" %}
+{% if field.fields != "char9" %}
 			<td>{{ part|get_obj_attr:field.fields }}</td>
 {% endif %}
 			{% endfor %}

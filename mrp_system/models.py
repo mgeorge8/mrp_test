@@ -56,6 +56,7 @@ class Part(models.Model):
     char6 = models.CharField(max_length=100, blank=True)
     char7 = models.CharField(max_length=100, blank=True)
     char8 = models.CharField(max_length=100, blank=True)
+    char9 = models.CharField(max_length=100, blank=True)
     integer1 = models.IntegerField(blank=True, null=True)
     integer2 = models.IntegerField(blank=True, null=True)
     datasheet = models.FileField(upload_to='documents/', blank=True)
