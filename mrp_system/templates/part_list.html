@@ -13,14 +13,19 @@
 <h2>{{ type }} Parts</h2>
 <a href="{% url 'create_part' type.id %}">Create new {{ type }}</a>
 <br><br>
+
 <form action="" method="post">
-{% csrf_token %}
+<div class="row">
+{% csrf_token %} 
 {% for field in form.visible_fields %}
-    <div class="group">
-     {{ field.label_tag }}
-      {{field}}
-    </div>
+
+<div class="group">
+     {{ field.label_tag }}</br>
+     {{field}}
+    </div>&nbsp;&nbsp;
   {% endfor %}
+
+</div>
 <input type="submit" value="Filter"/>
 </form>
 <hr/>

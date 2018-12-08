@@ -242,12 +242,8 @@ def ListParts(request, type_id):
         form = FilterForm(models=models, typeName=typeName)
     parts = parts.filter(**filters)
     if searchField == "" or searchField is None:
-        print(searchField)
-        print("not")
         parts = parts.distinct('id')
     else:
-        print(searchField)
-        print("none")
         parts = parts.annotate(search=SearchVector('manufacturer__name', 'location__name', 'char1', 'char2', Cast('integer1', CharField()), Cast('integer2', CharField()))).filter(search=searchField)
         parts = parts.distinct('id')
     
