@@ -12,6 +12,7 @@ FIELD_TYPES = {
     'char6': forms.CharField,
     'char7': forms.CharField,
     'char8': forms.CharField,
+    'char9': forms.CharField,
     'integer1': forms.IntegerField,
     'integer2': forms.IntegerField
     }
@@ -24,6 +25,7 @@ FIELDS_F = {
     'char6': 'char6',
     'char7': 'char7',
     'char8': 'char8',
+    'char9': 'char9',
     'integer1': 'integer1',
     'integer2': 'integer2'
     }
@@ -47,7 +49,7 @@ class PartForm(ModelForm):
                 self.fields[FIELDS_F[field.fields]].label = field.name
             #parts = partType.field.all()
             extra_fields = ('char1', 'char2', 'char3', 'char4', 'char5', 'char6',
-                            'char7', 'char8','integer1', 'integer2')
+                            'char7', 'char8','char9','integer1', 'integer2')
             for field in extra_fields:
                 if field not in partType.field.values_list('fields', flat=True):
                     self.fields.pop(field)
@@ -63,7 +65,7 @@ class ManufacturerForm(ModelForm):
         exclude = ('part',)
     
 ManufacturerFormSet = inlineformset_factory(Part, ManufacturerRelationship,
-                                            form=ManufacturerForm, extra=3)
+                                            form=ManufacturerForm, extra=1)
 
 class LocationForm(ModelForm):
     class Meta:
@@ -71,7 +73,7 @@ class LocationForm(ModelForm):
         exclude = ('part',)
         
 LocationFormSet = inlineformset_factory(Part, LocationRelationship,
-                                        form=LocationForm, extra=3)
+                                        form=LocationForm, extra=1)
         
 
 class TypeForm(ModelForm):

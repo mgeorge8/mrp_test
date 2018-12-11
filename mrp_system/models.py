@@ -32,6 +32,7 @@ class Field(models.Model):
         ('char6', 'Character 6'),
         ('char7', 'Character 7'),
         ('char8', 'Character 8'),
+        ('char9', 'Character 9'),
         ('integer1', 'Integer 1'),
         ('integer2', 'Integer 2'),
     )
@@ -41,7 +42,7 @@ class Field(models.Model):
 
 class Part(models.Model):
     partType = models.ForeignKey(Type, on_delete=models.CASCADE, related_name="part")
-    partNumber = models.CharField(max_length=30, blank=True, editable=False)
+    partNumber = models.IntegerField(blank=True, null=True, editable=False)
     engimusingPartNumber = models.CharField(max_length=30, editable=False)
     description = models.CharField(max_length=300, blank=True)
     #location = models.ManyToManyField(Location, related_name="loc")
@@ -70,15 +71,15 @@ class Part(models.Model):
         if self.location:
             #return self.location.all()
             #return '%s' % "-" % '%s' % " / ".join([location.name for location in self.location.all()])
-            return '%s' % '\n'.join([LocationRelationship.location.name for LocationRelationship
-                                     in self.locationrelationship_set.all()])
+            return [LocationRelationship.location.name for LocationRelationship
+                                     in self.locationrelationship_set.order_by('id')]
 
     def get_stock(self):
         if self.location:
             #return '\n'.join([str(LocationRelationship.stock) for LocationRelationship
              #                            in self.locationrelationship_set.all()])
-            return [str(LocationRelationship.stock) for LocationRelationship in
-                    self.locationrelationship_set.all()]
+            return [LocationRelationship for LocationRelationship in
+                    self.locationrelationship_set.order_by('id')]
 
     def get_manufacturers(self):
         if self.manufacturer:
@@ -94,6 +95,7 @@ class Part(models.Model):
             partType = self.partType
             self.engimusingPartNumber = increment_engi_partnumber(partType)
             self.partNumber = int(self.engimusingPartNumber[3:9])
+            print(self.partNumber)
         super().save(*args, **kwargs)
 
 def increment_engi_partnumber(partType):
@@ -102,7 +104,6 @@ def increment_engi_partnumber(partType):
     if not last_id:
         return suffix + '000001'
     partNumber = last_id.partNumber
-    partNumber = int(partNumber)
     new_partNumber = partNumber + 1
     new_engi_partNumber = suffix + str(new_partNumber).zfill(6)
     return new_engi_partNumber

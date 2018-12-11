@@ -19,6 +19,9 @@ urlpatterns = [
     url(r'^part/edit/(?P<type_id>\d+)/(?P<id>\d+)$',
         views.PartEdit,
         name='edit_part'),
+    url('part/delete/(?P<part_id>\d+)/$',
+        views.DeletePart.as_view(),
+        name='delete_part'),
     
     path('manufacturer/create/',
          views.CreateManufacturer.as_view(),
@@ -53,5 +56,8 @@ urlpatterns = [
     url('file/(?P<name>\d+)/$',
         views.view_file,
         name='view_file'),
+    url('location/relationship/(?P<locationrelationship_id>\d+)/$',
+        views.LocationRelationshipEdit,
+        name='edit_loc_rel'),
     
 ]

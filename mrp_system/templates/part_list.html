@@ -32,7 +32,7 @@
             
             <table class='table table-bordered table-striped table-condensed'>
                 <thead>
-                    <tr>
+                    <tr class="table-active">
 			<th>Engimusing Part Number</th>
 			{% if type.name == "Resistor" %}
 <th>Resistance</th>{% endif %}
@@ -54,18 +54,19 @@
 			{% endfor %}
 {% endif %}
 			<th>Edit</th>
+			<th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for part in parts %}
                         <tr>
 			<td>{{part.engimusingPartNumber}}</td>	
-{% if type.name == "Resistor" %} <td>{{part.integer1}}</td>{% endif %}	
+{% if type.name == "Resistor" %} <td>{{part.char9}}</td>{% endif %}	
                             <td>{{ part.description }}</td>
 			<td>{% if part.datasheet %}
 			    <a href="{{part.datasheet.url}}" target="_new">PDF</a>{% endif %}</td>
-                            <td>{{ part.get_location }}</td>
-			    <td>{% for stock in part.get_stock %}{{ stock }}</br>{% endfor %}</td>
+                            <td>{% for location in part.get_location %}{{ location }}</br>{% endfor %}</td>
+			    <td>{% for stock in part.get_stock %}{{ stock.stock }}<a href="{% url 'edit_loc_rel' stock.id %}?next={{ request.path|urlencode }}"><i class="fas fa-pencil-alt"></i></a></br>{% endfor %}</td>
 			     <td>{% for manu in part.get_manufacturers %}{{ manu }}</br>{% endfor %}</td>
 			     <td>{% for number in part.get_related %}{{ number }}</br>{% endfor %} </td>
 {% if type.name == "Resistor" %}
@@ -80,7 +81,8 @@
 			{% endfor %}
 {% endif %}
 			
-			    <td><a class="btn btn-primary btn-sm" href="{% url 'edit_part' type.id part.id %}"> Edit</a></td>
+			    <td><a class="btn btn-primary btn-sm" href="{% url 'edit_part' type.id part.id %}">Edit</a></td>
+			<td><a class="btn btn-primary btn-sm" href="{% url 'delete_part' part.id %}">Delete</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

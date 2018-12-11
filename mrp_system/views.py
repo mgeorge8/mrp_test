@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, TemplateView
 from mrp_system.models import (Part, Type, Field, Manufacturer,
-                               ManufacturerRelationship, Location)
+                               ManufacturerRelationship, Location, LocationRelationship)
 from mrp_system.forms import (FilterForm, PartForm, LocationForm, LocationFormSet, MergeLocationsForm, ManufacturerForm,
 ManufacturerFormSet, MergeManufacturersForm, FieldFormSet, TypeForm, TypeSelectForm)
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -43,21 +43,24 @@ def PartCreate(request, type_id):
     partType = Type.objects.get(id=type_id)
 
     if request.method == 'POST':
-        #self.object = None
         form = PartForm(type_id, request.POST, request.FILES)
         part_formset = ManufacturerFormSet(request.POST)
         location_formset = LocationFormSet(request.POST)
-        if (form.is_valid() and part_formset.is_valid() and location_formset.is_valid()):
+        if form.is_valid() and part_formset.is_valid() and location_formset.is_valid():
             self_object = form.save(commit=False)
             self_object.partType_id = type_id
-           # self_object.document = request.FILES['document']
             self_object.save()
-            #form.save_m2m()
             location_formset.instance = self_object
             location_formset.save()
+            #print(part_formset)
             part_formset.instance = self_object
-           # part_formset = ManufacturerFromSet(request.POST, instance = self_object)
             part_formset.save()
+##            for form in part_formset:
+##                man = form.cleaned_data['manufacturer']
+##                num = form.cleaned_data['partNumber']
+##                ManufacturerRelationship.objects.get_or_create(part=self_object,
+                                                              # manufacturer=man,
+                                                               #partNumber=num)
             url = reverse('list_parts', args=[partType.pk])
             return HttpResponseRedirect(url)
     else:
@@ -65,35 +68,25 @@ def PartCreate(request, type_id):
         form = PartForm(type_id=type_id)
         part_formset = ManufacturerFormSet()
         location_formset = LocationFormSet()
-    return render(request,'part_form.html',{'form': form,
+    return render(request,'part_form.html',{'part_form': form,
                                             'location_formset': location_formset,
                                             'part_formset': part_formset,
                                             'partType': partType})
 
 def PartEdit(request, type_id, id):
-##    model = GenericPart
-##    fields = '__all__'
-##    form_class = PartForm
-##    template_name = 'part_form.html'
-##    success_url = reverse_lazy('index')
     partType = Type.objects.get(id=type_id)
     instance = get_object_or_404(Part, id=id)
-    #relationship = get_object_or_404(ManufacturerRelationship
 
     if request.method == 'POST':
         #self.object = None
         form = PartForm(type_id, request.POST, request.FILES, instance=instance)
-        #part_formset = ManufacturerFormSet(request.POST)
+        part_formset = ManufacturerFormSet(request.POST, instance=instance)
+        location_formset = LocationFormSet(request.POST, instance=instance)
         if form.is_valid(): # and part_formset.is_valid()):
             part = form.save(commit=False)
             part.partType_id = type_id
-            part_formset = ManufacturerFormSet(request.POST, instance=part)
-            location_formset = LocationFormSet(request.POST, instance=part)
             if part_formset.is_valid() and location_formset.is_valid():
                 part.save()
-                #form.save_m2m()
-                #part_formset.instance = self_object
-           # part_formset = ManufacturerFromSet(request.POST, instance = self_object)
                 part_formset.save()
                 location_formset.save()
                 url = reverse('list_parts', args=[partType.pk])
@@ -103,7 +96,7 @@ def PartEdit(request, type_id, id):
         form = PartForm(type_id=type_id, instance=instance)
         part_formset = ManufacturerFormSet(instance=instance)
         location_formset = LocationFormSet(instance=instance)
-    return render(request,'part_form.html',{'form': form,
+    return render(request,'part_form.html',{'part_form': form,
                                             'location_formset': location_formset,
                                             'part_formset': part_formset,
                                             'partType': partType})
@@ -335,11 +328,35 @@ class LocationUpdate(UpdateView):
     template_name = 'update_location.html'
     success_url = reverse_lazy('list_locations')
 
+def LocationRelationshipEdit(request, locationrelationship_id):
+    rel = get_object_or_404(LocationRelationship, id=locationrelationship_id)
+    if request.method == "POST":
+        form = LocationForm(request.POST, instance=rel)
+        if form.is_valid():
+            form.save()
+            nextUrl = request.POST.get('next', '/')
+            print(nextUrl)
+            return HttpResponseRedirect(nextUrl)
+    else:
+        form = LocationForm(instance=rel)
+    return render(request, 'update_loc_relationship.html', {'form': form})
+##    model = LocationRelationship
+##    fields = ['location','stock']
+##    pk_url_kwarg = 'locationrelationship_id'
+##    template_name = 'update_loc_relationship.html'
+##    success_url = self.request.META.get('HTTP_REFERER', '/')
+
 class ManufacturerDelete(DeleteView):
     model = Manufacturer
     pk_url_kwarg = 'manufacturer_id'
     template_name = 'delete_manufacturer.html'
     success_url = reverse_lazy('list_manufacturers')
+
+class DeletePart(DeleteView):
+    model = Part
+    success_url = reverse_lazy('list_types')
+    pk_url_kwarg = 'part_id'
+    template_name = 'delete_part.html'
 
 class LocationDelete(DeleteView):
     model = Location
