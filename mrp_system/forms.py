@@ -60,6 +60,7 @@ class PartForm(ModelForm):
             
 
 class ManufacturerForm(ModelForm):
+    manufacturer = forms.ModelChoiceField(queryset=Manufacturer.objects.order_by('name'))
     class Meta:
         model = ManufacturerRelationship
         exclude = ('part',)
@@ -68,6 +69,7 @@ ManufacturerFormSet = inlineformset_factory(Part, ManufacturerRelationship,
                                             form=ManufacturerForm, extra=1)
 
 class LocationForm(ModelForm):
+    location = forms.ModelChoiceField(queryset=Location.objects.order_by('name'))
     class Meta:
         model = LocationRelationship
         exclude = ('part',)
@@ -165,5 +167,8 @@ class FilterForm(forms.Form):
 ##        char2 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
 ##        integer1 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
 ##        integer2 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
-     
+
+class EnterPartForm(forms.Form):
+        url = forms.CharField()
+        partType = forms.ModelChoiceField(queryset=Type.objects.all())
         

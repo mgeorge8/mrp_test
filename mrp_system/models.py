@@ -65,7 +65,7 @@ class Part(models.Model):
     #package = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.partNumber
+        return str(self.partNumber)
 
     def get_location(self):
         if self.location:

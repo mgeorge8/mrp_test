@@ -66,7 +66,11 @@
 			<td>{% if part.datasheet %}
 			    <a href="{{part.datasheet.url}}" target="_new">PDF</a>{% endif %}</td>
                             <td>{% for location in part.get_location %}{{ location }}</br>{% endfor %}</td>
-			    <td>{% for stock in part.get_stock %}{{ stock.stock }}<a href="{% url 'edit_loc_rel' stock.id %}?next={{ request.path|urlencode }}"><i class="fas fa-pencil-alt"></i></a></br>{% endfor %}</td>
+			    <td>{% if part.get_stock %}
+{% for stock in part.get_stock %}{{ stock.stock }}<a href="{% url 'edit_loc_rel' stock.id %}?next={{ request.path|urlencode }}"><i class="fas fa-pencil-alt"></i></a></br>{% endfor %}
+{% else %}<a href="{% url 'add_loc_rel' part.id %}?next={{ request.path|urlencode }}"><i class="fas fa-pencil-alt"></i></a>
+{% endif %}
+</td>
 			     <td>{% for manu in part.get_manufacturers %}{{ manu }}</br>{% endfor %}</td>
 			     <td>{% for number in part.get_related %}{{ number }}</br>{% endfor %} </td>
 {% if type.name == "Resistor" %}

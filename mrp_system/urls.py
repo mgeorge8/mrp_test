@@ -22,6 +22,9 @@ urlpatterns = [
     url('part/delete/(?P<part_id>\d+)/$',
         views.DeletePart.as_view(),
         name='delete_part'),
+    url('part/enter/$',
+        views.enter_part,
+        name='enter_part'),
     
     path('manufacturer/create/',
          views.CreateManufacturer.as_view(),
@@ -59,5 +62,8 @@ urlpatterns = [
     url('location/relationship/(?P<locationrelationship_id>\d+)/$',
         views.LocationRelationshipEdit,
         name='edit_loc_rel'),
+    url('location/relationship/add/(?P<part_id>\d+)\$',
+        views.LocationRelationshipAdd,
+        name='add_loc_rel'),
     
 ]

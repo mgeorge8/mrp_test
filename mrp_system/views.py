@@ -4,7 +4,7 @@ from django.views.generic import ListView, TemplateView
 from mrp_system.models import (Part, Type, Field, Manufacturer,
                                ManufacturerRelationship, Location, LocationRelationship)
 from mrp_system.forms import (FilterForm, PartForm, LocationForm, LocationFormSet, MergeLocationsForm, ManufacturerForm,
-ManufacturerFormSet, MergeManufacturersForm, FieldFormSet, TypeForm, TypeSelectForm)
+ManufacturerFormSet, MergeManufacturersForm, FieldFormSet, TypeForm, TypeSelectForm, EnterPartForm)
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.forms.models import inlineformset_factory
 from django.urls import reverse, reverse_lazy
@@ -14,6 +14,8 @@ from django.db.models.functions import Cast
 from django.db.models import CharField
 from django.contrib.postgres.search import SearchVector
 from django.core.files.storage import DefaultStorage
+import requests
+from bs4 import BeautifulSoup
 
 def view_file(request, name):
     storage = DefaultStorage()
@@ -35,11 +37,6 @@ class LocationListView(ListView):
     
 
 def PartCreate(request, type_id):
-##    model = GenericPart
-##    fields = '__all__'
-##    form_class = PartForm
-##    template_name = 'part_form.html'
-##    success_url = reverse_lazy('index')
     partType = Type.objects.get(id=type_id)
 
     if request.method == 'POST':
@@ -52,19 +49,11 @@ def PartCreate(request, type_id):
             self_object.save()
             location_formset.instance = self_object
             location_formset.save()
-            #print(part_formset)
             part_formset.instance = self_object
             part_formset.save()
-##            for form in part_formset:
-##                man = form.cleaned_data['manufacturer']
-##                num = form.cleaned_data['partNumber']
-##                ManufacturerRelationship.objects.get_or_create(part=self_object,
-                                                              # manufacturer=man,
-                                                               #partNumber=num)
             url = reverse('list_parts', args=[partType.pk])
             return HttpResponseRedirect(url)
     else:
-        #self.object = None
         form = PartForm(type_id=type_id)
         part_formset = ManufacturerFormSet()
         location_formset = LocationFormSet()
@@ -340,11 +329,20 @@ def LocationRelationshipEdit(request, locationrelationship_id):
     else:
         form = LocationForm(instance=rel)
     return render(request, 'update_loc_relationship.html', {'form': form})
-##    model = LocationRelationship
-##    fields = ['location','stock']
-##    pk_url_kwarg = 'locationrelationship_id'
-##    template_name = 'update_loc_relationship.html'
-##    success_url = self.request.META.get('HTTP_REFERER', '/')
+
+def LocationRelationshipAdd(request, part_id):
+    part = get_object_or_404(Part, id=part_id)
+    if request.method == "POST":
+        form = LocationForm(request.POST)
+        if form.is_valid():
+            location = form.cleaned_data['location']
+            stock = form.cleaned_data['stock']
+            LocationRelationship.objects.create(part=part, location=location, stock=stock)
+            nextUrl = request.POST.get('next', '/')
+            return HttpResponseRedirect(nextUrl)
+    else:
+        form = LocationForm()
+    return render(request, 'add_loc_relationship.html', {'form': form})
 
 class ManufacturerDelete(DeleteView):
     model = Manufacturer
@@ -413,6 +411,52 @@ def MergeLocation(primary_object, alias_object):
     for part in parts:
         part.location.add(primary_object)
         part.location.filter(id=alias_object.id).delete()
+
+def enter_part(request):
+    if request.method == "POST":
+        form = EnterPartForm(request.POST)
+        if form.is_valid():
+            url = form.cleaned_data['url']
+            partType = form.cleaned_data['partType']
+            page = requests.get(url, timeout=10)
+            data = BeautifulSoup(page.text, 'html.parser')
+            manufacturer_table = data.find(id="product-overview")
+            manufacturer_table_list = manufacturer_table.find_all("th")
+            for manufacturer in manufacturer_table_list:
+                header = manufacturer.text.strip()
+                row = manufacturer.find_next_sibling().text.strip()
+                if header == 'Manufacturer':
+                    manu = row
+                if header == 'Manufacturer Part Number':
+                    man_partNumber = row
+                if header == 'Detailed Description':
+                    detailed_descript = row
+
+            manu, created = Manufacturer.objects.get_or_create(name=manu)
+            
+            part_table = data.find(id="product-attribute-table")
+            part_table_list = part_table.find_all("th")
+            part_attr = {}
+            for part in part_table_list:
+                header = part.text.strip()
+                row = part.find_next_sibling().text.strip()
+                part_attr[header] = row
+                
+            part = Part.objects.create(partType=partType, description=detailed_descript)
+            for field in partType.field.all():
+                name = part_attr.get(field.name)
+                f = field.fields
+                setattr(part, f, name)
+
+            part.save()
+            
+            ManufacturerRelationship.objects.create(part=part, manufacturer=manu,
+                                                partNumber=man_partNumber)
+            redirect_url = reverse('list_parts', args=[partType.pk])
+            return HttpResponseRedirect(redirect_url)
+    else:
+        form = EnterPartForm()
+    return render(request, "enter_part.html", {"form":form})
         
 
 
