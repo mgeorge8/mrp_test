@@ -33,6 +33,12 @@ class Field(models.Model):
         ('char7', 'Character 7'),
         ('char8', 'Character 8'),
         ('char9', 'Character 9'),
+        ('char10', 'Character 10'),
+        ('char11', 'Character 11'),
+        ('char12', 'Character 12'),
+        ('char13', 'Character 13'),
+        ('char14', 'Character 14'),
+        ('char15', 'Character 15'),
         ('integer1', 'Integer 1'),
         ('integer2', 'Integer 2'),
     )
@@ -58,6 +64,12 @@ class Part(models.Model):
     char7 = models.CharField(max_length=100, blank=True)
     char8 = models.CharField(max_length=100, blank=True)
     char9 = models.CharField(max_length=100, blank=True)
+    char10 = models.CharField(max_length=100, blank=True)
+    char11 = models.CharField(max_length=100, blank=True)
+    char12 = models.CharField(max_length=100, blank=True)
+    char13 = models.CharField(max_length=100, blank=True)
+    char14 = models.CharField(max_length=100, blank=True)
+    char15 = models.CharField(max_length=100, blank=True)
     integer1 = models.IntegerField(blank=True, null=True)
     integer2 = models.IntegerField(blank=True, null=True)
     datasheet = models.FileField(upload_to='documents/', blank=True)

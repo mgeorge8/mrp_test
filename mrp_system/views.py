@@ -204,6 +204,19 @@ def ListParts(request, type_id):
         location = request.POST.getlist('location')
         char1 = request.POST.getlist('char1')
         char2 = request.POST.getlist('char2')
+        char3 = request.POST.getlist('char3')
+        char4 = request.POST.getlist('char4')
+        char5 = request.POST.getlist('char5')
+        char6 = request.POST.getlist('char6')
+        char7 = request.POST.getlist('char7')
+        char8 = request.POST.getlist('char8')
+        char9 = request.POST.getlist('char9')
+        char10 = request.POST.getlist('char10')
+        char11 = request.POST.getlist('char11')
+        char12 = request.POST.getlist('char12')
+        char13 = request.POST.getlist('char13')
+        char14 = request.POST.getlist('char14')
+        char15 = request.POST.getlist('char15')
         integer1 = request.POST.getlist('integer1')
         integer2 = request.POST.getlist('integer2')
         searchField = request.POST.get('search')
@@ -215,6 +228,32 @@ def ListParts(request, type_id):
             filters['char1__in'] = char1
         if len(char2) > 0:
             filters['char2__in'] = char2
+        if len(char3) > 0:
+            filters['char3__in'] = char3
+        if len(char4) > 0:
+            filters['char4__in'] = char4
+        if len(char5) > 0:
+            filters['char5__in'] = char5
+        if len(char6) > 0:
+            filters['char6__in'] = char6
+        if len(char7) > 0:
+            filters['char7__in'] = char7
+        if len(char8) > 0:
+            filters['char8__in'] = char8
+        if len(char9) > 0:
+            filters['char9__in'] = char9
+        if len(char10) > 0:
+            filters['char10__in'] = char10
+        if len(char11) > 0:
+            filters['char11__in'] = char11
+        if len(char12) > 0:
+            filters['char12__in'] = char12
+        if len(char13) > 0:
+            filters['char13__in'] = char13
+        if len(char14) > 0:
+            filters['char14__in'] = char14
+        if len(char15) > 0:
+            filters['char15__in'] = char15
         if len(integer1) > 0:
             filters['integer1__in'] = integer1
         if len(integer2) > 0:
@@ -228,60 +267,14 @@ def ListParts(request, type_id):
     else:
         parts = parts.annotate(search=SearchVector('manufacturer__name', 'location__name', 'char1', 'char2', Cast('integer1', CharField()), Cast('integer2', CharField()))).filter(search=searchField)
         parts = parts.distinct('id')
-    
+    current_filters = ''
+    if filters.items():
+        for k, v in filters.items():
+            current_filters += "{},   ".format(v)
     return render(request, 'part_list.html', {'type': partType, 'parts': parts,
-                                              'fields': fields, 'form': form})
+                                              'fields': fields, 'form': form,
+                                              'current_filters': current_filters})
     
-##class ListParts(TemplateView):
-##    template_name = 'part_list.html'
-##
-##    def post(self, request, *args, **kwargs):
-##        context = self.get_context_data()
-####        if context['form'].is_valid():
-####            print ('yes done')
-####            #context['form'].save()
-####            
-####            url = reverse('list_parts', args=[partType.pk])
-####            #url = request.GET.get('next', reverse('dashboard'))
-####            return HttpResponseRedirect(url)
-##            #return redirect('week_timesheet', user_id=entry.pk)
-##        return super(ListParts, self).render_to_response(context)
-##    
-##    def get_context_data(self, *args, **kwargs):
-##        context = super(ListParts, self).get_context_data(**kwargs)
-####        filters = {}
-####
-####        for key, value in self.kwargs.items():
-####            if key in ['location', 'manufacturer', 'char1', 'char2', 'integer1', 'integer2']:
-####                filters[key] = value
-##
-##        #Test.objects.filter(**filters)
-##        filter_names = ('location', 'manufacturer', 'char1')
-##
-##       # queryset = Books.objects.all(); 
-##        filter_clauses = [Q(filter=self.kwargs[filter])
-##                      for filter in filter_names
-##                      if self.kwargs[filter]]
-####        if filter_clauses:
-####            queryset = queryset.filter(reduce(operator.and_, filter_clauses))       
-##        #form = TypeSelectForm(self.request.POST or None)
-##        form = FilterForm(self.request.POST or None)
-##        type_id = self.kwargs['type_id']
-##        partType = Type.objects.get(id=type_id)
-##        man = Manufacturer.objects.get(name="manu1")
-##        parts = Part.objects.filter(partType=partType)
-##        if filter_clauses:
-##            parts = parts.filter(reduce(operator.and_, filter_clauses))
-##        #parts = parts.filter(**filters)
-##        fields = Field.objects.filter(typePart_id=type_id)
-##
-##        context.update({
-##            'type': partType,
-##            'parts': parts,
-##            'fields': fields,
-##            'form': form,
-##            })
-##        return context
 
 class CreateManufacturer(CreateView):
     model = Manufacturer

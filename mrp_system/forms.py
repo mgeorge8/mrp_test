@@ -13,6 +13,12 @@ FIELD_TYPES = {
     'char7': forms.CharField,
     'char8': forms.CharField,
     'char9': forms.CharField,
+    'char10': forms.CharField,
+    'char11': forms.CharField,
+    'char12': forms.CharField,
+    'char13': forms.CharField,
+    'char14': forms.CharField,
+    'char15': forms.CharField,
     'integer1': forms.IntegerField,
     'integer2': forms.IntegerField
     }
@@ -26,6 +32,12 @@ FIELDS_F = {
     'char7': 'char7',
     'char8': 'char8',
     'char9': 'char9',
+    'char10': 'char10',
+    'char11': 'char11',
+    'char12': 'char12',
+    'char13': 'char13',
+    'char14': 'char14',
+    'char15': 'char15',
     'integer1': 'integer1',
     'integer2': 'integer2'
     }
@@ -49,7 +61,8 @@ class PartForm(ModelForm):
                 self.fields[FIELDS_F[field.fields]].label = field.name
             #parts = partType.field.all()
             extra_fields = ('char1', 'char2', 'char3', 'char4', 'char5', 'char6',
-                            'char7', 'char8','char9','integer1', 'integer2')
+                            'char7', 'char8','char9','char10','char11','char12',
+                            'char13','char14','char15','integer1', 'integer2')
             for field in extra_fields:
                 if field not in partType.field.values_list('fields', flat=True):
                     self.fields.pop(field)
@@ -127,7 +140,7 @@ class CustomInlineFormset(BaseInlineFormSet):
 
                         
 
-FieldFormSet = inlineformset_factory(Type, Field, form=FieldForm, extra=10, max_num=10,
+FieldFormSet = inlineformset_factory(Type, Field, form=FieldForm, extra=17, max_num=17,
                                      formset=CustomInlineFormset)
 
 class TypeSelectForm(forms.Form):
@@ -163,10 +176,6 @@ class FilterForm(forms.Form):
         search = forms.CharField(required=False)
         location = forms.ModelMultipleChoiceField(required=False, queryset = Location.objects.none())
         manufacturer = forms.ModelMultipleChoiceField(required=False, queryset = Manufacturer.objects.none())
-##        char1 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
-##        char2 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
-##        integer1 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
-##        integer2 = forms.ModelMultipleChoiceField(required=False, queryset = Part.objects.none())
 
 class EnterPartForm(forms.Form):
         url = forms.CharField()
