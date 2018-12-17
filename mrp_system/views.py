@@ -157,7 +157,7 @@ class EditType(UpdateView):
 
        # return super(TypeEdit, self).form_valid(form)
 
-    def form_invalid(self, form, part_formset):
+    def form_invalid(self, form, field_formset):
         return self.render_to_response(
             self.get_context_data(form=form, field_formset=field_formset))
 
@@ -272,8 +272,7 @@ def ListParts(request, type_id):
         for k, v in filters.items():
             current_filters += "{},   ".format(v)
     return render(request, 'part_list.html', {'type': partType, 'parts': parts,
-                                              'fields': fields, 'form': form,
-                                              'current_filters': current_filters})
+                                              'fields': fields, 'form': form})
     
 
 class CreateManufacturer(CreateView):
@@ -450,8 +449,36 @@ def enter_part(request):
     else:
         form = EnterPartForm()
     return render(request, "enter_part.html", {"form":form})
-        
+
+import http.client
+
+def oauth(request):
+
+    conn = http.client.HTTPSConnection("api.digikey.com")
+
+    payload = "{\"SearchOptions\":[\"ManufacturerPartSearch\"],\"Keywords\":\"p5555-nd\",\"RecordCount\":\"10\",\"RecordStartPosition\":\"0\",\"Filters\":{\"CategoryIds\":[27442628],\"FamilyIds\":[81316194],\"ManufacturerIds\":[88520800],\"ParametricFilters\":[{\"ParameterId\":\"725\",\"ValueId\":\"7\"}]},\"Sort\":{\"Option\":\"SortByUnitPrice\",\"Direction\":\"Ascending\",\"SortParameterId\":\"50\"},\"RequestedQuantity\":\"50\"}"
+
+    headers = {
+        'x-ibm-client-id': '73432ca9-e8ba-4965-af17-a22107f63b35',
+        'x-digikey-locale-site': "US",
+        'x-digikey-locale-language': "en",
+        'x-digikey-locale-currency': "USD",
+        #'x-digikey-locale-shiptocountry': ,
+##        'x-digikey-customer-id': "REPLACE_THIS_VALUE",
+##        'x-digikey-partner-id': "REPLACE_THIS_VALUE",
+        'authorization': "QVhAum4tdogouAdEkCt23amqaMad",
+        'content-type': "application/json",
+        'accept': "application/json"
+        }
+
+    conn.request("POST", "/services/partsearch/v2/keywordsearch", payload, headers)
+
+    res = conn.getresponse()
+    data = res.read()
+
+    print(data.decode("utf-8"))
+    return render(request, "oauth.html", {'code':data})
 
 
 
-    
+

@@ -65,5 +65,8 @@ urlpatterns = [
     url('location/relationship/add/(?P<part_id>\d+)\$',
         views.LocationRelationshipAdd,
         name='add_loc_rel'),
+    url('oauth/$',
+        views.oauth,
+        name='oauth'),
     
 ]
