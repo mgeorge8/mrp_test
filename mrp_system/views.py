@@ -162,37 +162,16 @@ class EditType(UpdateView):
             self.get_context_data(form=form, field_formset=field_formset))
 
 
-class PartListView(ListView):
-    model = Part
-    paginate_by = 20
-    template_name = 'list.html'
-    context_object_name = 'parts'
-    queryset = Part.objects.prefetch_related('manufacturer')
-    query_part = ''
-
-##    def get_context_data(self, **kwargs):
-##        context = super(PartListView, self).get_context_data(**kwargs)
-##        context['form'] = PartListSearchForm(self.query_part)
-##        context['search_request'] = ('query_part=' + str(self.query_part))
-##        return context
-##
-##    def get(self, request, *args, **kwargs):
-##        self.query_part = request.GET.get('query_part', '')
-##        return super(PartListView, self).get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        if not self.query_part:
-            part_list = Part.objects.all()
-        else:
-            part_list = Part.objects.filter(name__icontains=self.query_part)
-
-        return part_list
 
 def ListParts(request, type_id):
     filters={}
     partType = Type.objects.get(id=type_id)
     parts = Part.objects.filter(partType=partType)
     fields = Field.objects.filter(typePart_id=type_id)
+    name = ''
+    for field in fields:
+        if field.fields == "char1":
+            name = field.name
     typeName = partType.name
     searchField = None
     models={}
@@ -272,7 +251,8 @@ def ListParts(request, type_id):
         for k, v in filters.items():
             current_filters += "{},   ".format(v)
     return render(request, 'part_list.html', {'type': partType, 'parts': parts,
-                                              'fields': fields, 'form': form})
+                                              'fields': fields, 'form': form,
+                                              'name': name})
     
 
 class CreateManufacturer(CreateView):

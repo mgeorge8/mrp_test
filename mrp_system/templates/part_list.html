@@ -36,25 +36,20 @@
                 <thead>
                     <tr class="table-active">
 			<th>Engimusing Part Number</th>
-			{% if type.name == "Resistor" %}
-<th>Resistance</th>{% endif %}
+			{% if name %}
+<th>{{ name }}</th>{% endif %}
                         <th>Description</th>
 			<th>Datasheet</th>
                         <th>Location</th>
 			<th>In Stock</th>
 			<th>Manufacturer</th>
 			 <th>Part Number</th>
-{% if type.name == "Resistor" %}
-{% for field in fields %}
-{% if field.name != "Resistance" %}
-<th>{{ field.name }}</th>
-{% endif %}
-{% endfor %}
-{% else %}
 			{% for field in fields %}
+			{% if field.fields != "char1" %}
 			<th>{{ field.name }}</th>
+			{% endif %}
 			{% endfor %}
-{% endif %}
+
 			<th>Edit</th>
 			<th>Delete</th>
                     </tr>
@@ -63,7 +58,7 @@
                     {% for part in parts %}
                         <tr>
 			<td>{{part.engimusingPartNumber}}</td>	
-{% if type.name == "Resistor" %} <td>{{part.char9}}</td>{% endif %}	
+{% if name %} <td>{{part.char1}}</td>{% endif %}	
                             <td>{{ part.description }}</td>
 			<td>{% if part.datasheet %}
 			    <a href="{{part.datasheet.url}}" target="_new">PDF</a>{% endif %}</td>
@@ -75,17 +70,12 @@
 </td>
 			     <td>{% for manu in part.get_manufacturers %}{{ manu }}</br>{% endfor %}</td>
 			     <td>{% for number in part.get_related %}{{ number }}</br>{% endfor %} </td>
-{% if type.name == "Resistor" %}
+
 {% for field in fields %}
-{% if field.fields != "char9" %}
+{% if field.fields != "char1" %}
 			<td>{{ part|get_obj_attr:field.fields }}</td>
 {% endif %}
 			{% endfor %}
-{% else %}
-			{% for field in fields %}
-			<td>{{ part|get_obj_attr:field.fields }}</td>
-			{% endfor %}
-{% endif %}
 			
 			    <td><a class="btn btn-primary btn-sm" href="{% url 'edit_part' type.id part.id %}">Edit</a></td>
 			<td><a class="btn btn-primary btn-sm" href="{% url 'delete_part' part.id %}">Delete</a></td>
