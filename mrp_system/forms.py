@@ -19,6 +19,11 @@ FIELD_TYPES = {
     'char13': forms.CharField,
     'char14': forms.CharField,
     'char15': forms.CharField,
+    'char16': forms.CharField,
+    'char17': forms.CharField,
+    'char18': forms.CharField,
+    'char19': forms.CharField,
+    'char20': forms.CharField,
     'integer1': forms.IntegerField,
     'integer2': forms.IntegerField
     }
@@ -38,6 +43,11 @@ FIELDS_F = {
     'char13': 'char13',
     'char14': 'char14',
     'char15': 'char15',
+    'char16': 'char16',
+    'char17': 'char17',
+    'char18': 'char18',
+    'char19': 'char19',
+    'char20': 'char20',
     'integer1': 'integer1',
     'integer2': 'integer2'
     }
@@ -62,7 +72,8 @@ class PartForm(ModelForm):
             #parts = partType.field.all()
             extra_fields = ('char1', 'char2', 'char3', 'char4', 'char5', 'char6',
                             'char7', 'char8','char9','char10','char11','char12',
-                            'char13','char14','char15','integer1', 'integer2')
+                            'char13','char14','char15','char16','char17','char18',
+                            'char19','char20','integer1', 'integer2')
             for field in extra_fields:
                 if field not in partType.field.values_list('fields', flat=True):
                     self.fields.pop(field)

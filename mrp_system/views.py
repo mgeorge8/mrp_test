@@ -196,6 +196,11 @@ def ListParts(request, type_id):
         char13 = request.POST.getlist('char13')
         char14 = request.POST.getlist('char14')
         char15 = request.POST.getlist('char15')
+        char16 = request.POST.getlist('char16')
+        char17 = request.POST.getlist('char17')
+        char18 = request.POST.getlist('char18')
+        char19 = request.POST.getlist('char19')
+        char20 = request.POST.getlist('char20')
         integer1 = request.POST.getlist('integer1')
         integer2 = request.POST.getlist('integer2')
         searchField = request.POST.get('search')
@@ -233,6 +238,16 @@ def ListParts(request, type_id):
             filters['char14__in'] = char14
         if len(char15) > 0:
             filters['char15__in'] = char15
+        if len(char16) > 0:
+            filters['char16__in'] = char15
+        if len(char17) > 0:
+            filters['char17__in'] = char15
+        if len(char18) > 0:
+            filters['char18__in'] = char15
+        if len(char19) > 0:
+            filters['char19__in'] = char15
+        if len(char20) > 0:
+            filters['char20__in'] = char15
         if len(integer1) > 0:
             filters['integer1__in'] = integer1
         if len(integer2) > 0:

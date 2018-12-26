@@ -14,7 +14,7 @@ class Location(models.Model):
 
 class Type(models.Model):
     name = models.CharField(max_length=30)
-    suffix = models.CharField(max_length=3)
+    prefix = models.CharField(max_length=3)
     #field = models.ForeignKey(Field, on_delete=models.CASCADE,
      #                         related_name="type", null=True)
 
@@ -39,6 +39,11 @@ class Field(models.Model):
         ('char13', 'Character 13'),
         ('char14', 'Character 14'),
         ('char15', 'Character 15'),
+        ('char16', 'Character 16'),
+        ('char17', 'Character 17'),
+        ('char18', 'Character 18'),
+        ('char19', 'Character 19'),
+        ('char20', 'Character 20'),
         ('integer1', 'Integer 1'),
         ('integer2', 'Integer 2'),
     )
@@ -70,6 +75,11 @@ class Part(models.Model):
     char13 = models.CharField(max_length=100, blank=True)
     char14 = models.CharField(max_length=100, blank=True)
     char15 = models.CharField(max_length=100, blank=True)
+    char16 = models.CharField(max_length=100, blank=True)
+    char17 = models.CharField(max_length=100, blank=True)
+    char18 = models.CharField(max_length=100, blank=True)
+    char19 = models.CharField(max_length=100, blank=True)
+    char20 = models.CharField(max_length=100, blank=True)
     integer1 = models.IntegerField(blank=True, null=True)
     integer2 = models.IntegerField(blank=True, null=True)
     datasheet = models.FileField(upload_to='documents/', blank=True)
@@ -112,12 +122,12 @@ class Part(models.Model):
 
 def increment_engi_partnumber(partType):
     last_id = Part.objects.filter(partType=partType).order_by('partNumber').last()
-    suffix = partType.suffix
+    prefix = partType.prefix
     if not last_id:
-        return suffix + '000001'
+        return prefix + '000001'
     partNumber = last_id.partNumber
     new_partNumber = partNumber + 1
-    new_engi_partNumber = suffix + str(new_partNumber).zfill(6)
+    new_engi_partNumber = prefix + str(new_partNumber).zfill(6)
     return new_engi_partNumber
 
 class ManufacturerRelationship(models.Model):
